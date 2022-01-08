@@ -1,12 +1,9 @@
 # SSO-Demo
 
 
-```bash
-git pull mysql:5.6
 
-docker run  -it \
---name=sql-server \
---env="MYSQL_ROOT_PASSWORD=123456" \
---publish 6603:3306 \
-mysql
-```
+
+
+
+
+[Reference ]("https://codeburst.io/building-a-simple-single-sign-on-sso-server-and-solution-from-scratch-in-node-js-ea6ee5fdf340")
