@@ -1,23 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import axios from "axios";
+
+const SSO_SERVER_BE = process.env.REACT_APP_API
+
 
 function App() {
+  const [auth, setAuth] = React.useState({
+    username: "",
+    password: "",
+  });
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(`${SSO_SERVER_BE}login`, auth);
+      console.log("responseee", response?.data);
+    } catch (error) {}
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1> SSO-SERVER </h1>
+      <div>
+        <div>Username:</div>
+        <input
+          onChange={(e) => {
+            setAuth((pre) => {
+              return { ...pre, username: e.target.value };
+            });
+          }}
+        />
+        <div>Password:</div>
+        <input
+          onChange={(e) => {
+            setAuth((pre) => {
+              return { ...pre, password: e.target.value };
+            });
+          }}
+        />
+        <div>Submit: </div>
+        <button onClick={handleLogin}>Login</button>
+      </div>
     </div>
   );
 }

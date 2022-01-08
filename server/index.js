@@ -1,11 +1,17 @@
-var express = require("express");
-var app = express();
+const app = require("express")();
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
-const PORT = 3000;
+const cors = require("cors");
+
+const PORT = 4000;
 const ListAccount = require("./ListAcount");
 const SECRET = "SECRET";
 
+const corsOptions = {
+  origin: "http://localhost:3000",
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.post("/login", async (req, res) => {
