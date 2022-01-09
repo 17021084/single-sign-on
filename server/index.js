@@ -2,17 +2,76 @@ const app = require("express")();
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-
+const cookieParser = require("cookie-parser");
 const PORT = 4000;
 const ListAccount = require("./ListAcount");
 const SECRET = "SECRET";
 
-const corsOptions = {
-  origin: "http://localhost:3000",
-};
+var allowedOrigins = [
+  "http://localhost:5000",
+  "http://localhost:3000", // cho domain ngoại lai
+  "http://localhost:3001",
+  "http://localhost:3002",
+  "http://localhost:3003",
 
-app.use(cors(corsOptions));
+  // xet alias o
+  "http://service.diffent-company.com", // localhost 3000
+  "http://service1.company.com",
+  "http://service2.company.com",
+  "http://service3.company.com",
+];
+
+app.use(
+  cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      // allow requests with no origin
+      // (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        var msg =
+          "The CORS policy for this site does not " +
+          "allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 app.use(bodyParser.json());
+app.use(cookieParser());
+
+async function guardianMiddleware(req, res, next) {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).send({
+        message: "Unauthorized",
+      });
+    }
+    const decoded = await jwt.verify(token, SECRET);
+    const user = ListAccount.find((account) => account.id === decoded.id);
+    if (!user) {
+      return res.status(401).send({
+        message: "Unauthorized",
+      });
+    }
+    req.authUser = decoded;
+    next();
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).send({
+      message: error,
+    });
+  }
+}
+
+app.get("/", guardianMiddleware, async (req, res) => {
+  res.status(200).send({
+    message: "success",
+    user: req.authUser,
+  });
+});
 
 app.post("/login", async (req, res) => {
   try {
@@ -39,9 +98,9 @@ app.post("/login", async (req, res) => {
         id: user.id,
       },
       SECRET,
-      { expiresIn: 60 * 60 }
+      { expiresIn: 60 * 60 * 60 }
     );
-    console.log(token);
+    res.cookie("token", token);
     res.send({
       token,
     });
