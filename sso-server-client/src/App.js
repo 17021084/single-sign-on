@@ -33,6 +33,7 @@ const parseParams = () => {
 
 // company.trung:5000
 function App() {
+  // eslint-disable-next-line no-unused-vars
   const [cookies, setCookie, removeCookie] = useCookies(["name"]);
   const [logged, setLogged] = React.useState(false);
   const [auth, setAuth] = React.useState({
@@ -57,7 +58,10 @@ function App() {
   };
 
   const logout = () => {
-    removeCookie("token");
+    removeCookie('token', {
+      domain: "company.trung",
+    });
+    // co the dung document.cookie=""
     setLogged(false);
   };
 

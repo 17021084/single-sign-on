@@ -15,7 +15,6 @@ function App() {
   React.useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log(cookies);
         if (!cookies) {
           return setLogged(false);
         }
@@ -45,7 +44,9 @@ function App() {
     window.location.href = `${SSO_SERVER_FE}?serviceUrl=${window.location.origin}`;
   };
   const logout = () => {
-    removeCookie("token");
+    removeCookie('token', {
+      domain: "company.trung",
+    });
     setLogged(false);
   };
 
