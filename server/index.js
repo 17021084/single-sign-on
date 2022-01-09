@@ -9,6 +9,8 @@ const SECRET = "SECRET";
 
 var allowedOrigins = [
   "http://localhost:5000",
+  "http://company.com",
+
   "http://localhost:3000", // cho domain ngoại lai
   "http://localhost:3001",
   "http://localhost:3002",
