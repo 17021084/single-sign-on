@@ -1,40 +1,33 @@
 import axios from "axios";
 import React from "react";
 import "./App.css";
+import { useCookies } from "react-cookie";
 
 const SSO_SERVER_BE = process.env.REACT_APP_API;
 const SSO_SERVER_FE = process.env.REACT_APP_SSO_FE;
 const PORT = process.env.PORT;
 
-
-const parseCookies = (cookies) => {
-  if (!cookies) return null;
-  let listCookies = {};
-  cookies?.split(";")?.forEach((cookie) => {
-    let splitCookie = cookie.split("=");
-    listCookies[splitCookie[0]] = splitCookie[1];
-  });
-  return listCookies;
-};
-
 function App() {
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const [logged, setLogged] = React.useState(false);
   const [user, setUser] = React.useState();
 
   React.useEffect(() => {
     const checkAuth = async () => {
       try {
-        const cookies = parseCookies(document.cookie);
-        if (!cookies.token) {
+        console.log(cookies);
+        if (!cookies) {
           return setLogged(false);
         }
+
         const response = await axios.get(SSO_SERVER_BE, {
           params: {
             serviceUrl: window.location.origin,
           },
-          withCredentials: true,
+          // withCredentials: true,
           headers: {
-            Cookie: `token=${cookies.token};`,
+            setCookie: `token=${cookies.token}`,
+            // Cookie: `token=123123;`,
           },
         });
 
@@ -52,7 +45,7 @@ function App() {
     window.location.href = `${SSO_SERVER_FE}?serviceUrl=${window.location.origin}`;
   };
   const logout = () => {
-    document.cookie = "token=";
+    removeCookie("token");
     setLogged(false);
   };
 

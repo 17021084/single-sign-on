@@ -8,24 +8,26 @@ const ListAccount = require("./ListAcount");
 const SECRET = "SECRET";
 
 var allowedOrigins = [
+  // SSO-login
   "http://localhost:5000",
-  "http://company.com",
+  "http://company.trung:5000",
 
   "http://localhost:3000", // cho domain ngoại lai
   "http://localhost:3001",
   "http://localhost:3002",
   "http://localhost:3003",
 
-  // xet alias o
-  "http://service.diffent-company.com", // localhost 3000
-  "http://service1.company.com",
-  "http://service2.company.com",
-  "http://service3.company.com",
+  // alias /etc/hosts
+  "http://service.diffent-company.trung:3000",
+  "http://service1.company.trung:3001",
+  "http://service2.company.trung:3002",
+  "http://service3.company.trung:3003",
 ];
 
 app.use(
   cors({
     credentials: true,
+    exposedHeaders: ["set-cookie"],
     origin: function (origin, callback) {
       // allow requests with no origin
       // (like mobile apps or curl requests)
@@ -45,7 +47,9 @@ app.use(cookieParser());
 
 async function guardianMiddleware(req, res, next) {
   try {
-    const token = req.cookies.token;
+    const token = req.headers.setcookie.split("=")[1];
+    // fe ko gui cookie qua axios dc
+    // const token = req.cookies.token;
     if (!token) {
       return res.status(401).send({
         message: "Unauthorized",

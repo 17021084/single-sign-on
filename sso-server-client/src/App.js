@@ -1,19 +1,19 @@
 import React from "react";
 import "./App.css";
 import axios from "axios";
+import { useCookies } from "react-cookie";
 
 const SSO_SERVER_BE = process.env.REACT_APP_API;
 const allowedOrigins = [
-  "http://localhost:3000", // cho domain ngoại lai
   "http://localhost:3001",
   "http://localhost:3002",
   "http://localhost:3003",
 
-  // xet alias o
-  "http://service.diffent-company.com", // localhost 3000
-  "http://service1.company.com",
-  "http://service2.company.com",
-  "http://service3.company.com",
+  // xet alias etc
+  "http://service.diffent-company.trung:3000",
+  "http://service1.company.trung:3001",
+  "http://service2.company.trung:3002",
+  "http://service3.company.trung:3003",
 ];
 
 const parseParams = () => {
@@ -31,7 +31,9 @@ const parseParams = () => {
   return params;
 };
 
+// company.trung:5000
 function App() {
+  const [cookies, setCookie, removeCookie] = useCookies(["name"]);
   const [logged, setLogged] = React.useState(false);
   const [auth, setAuth] = React.useState({
     username: "",
@@ -41,7 +43,11 @@ function App() {
     try {
       e.preventDefault();
       const response = await axios.post(`${SSO_SERVER_BE}login`, auth);
-      document.cookie = `token=${response?.data?.token};`;
+      // document.cookie = `token=${response?.data?.token};`;
+      setCookie("token", response?.data?.token, {
+        path: "/",
+        domain: ".company.trung",
+      });
       const serviceUrl = parseParams()?.serviceUrl;
       if (serviceUrl && allowedOrigins.includes(serviceUrl)) {
         return (window.location.href = serviceUrl);
@@ -51,7 +57,7 @@ function App() {
   };
 
   const logout = () => {
-    document.cookie = "token=";
+    removeCookie("token");
     setLogged(false);
   };
 
